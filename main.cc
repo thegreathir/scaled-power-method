@@ -19,8 +19,11 @@ int main() {
     });
 
     matrix2 *= matrix1;
-    matrix2 *= 2;
+    //matrix2 *= 2;
 
+    std::cout << 2 * matrix2 << std::endl;
+    std::cout << matrix2 * 12 << std::endl;
+    matrix2 *= 12;
     std::cout << matrix2 << std::endl;
 
     return 0;

@@ -6,6 +6,7 @@
 #include <ios>
 #include <sstream>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 #include <iostream>
 #include <iomanip>
@@ -50,8 +51,7 @@ public:
         return res;
     }
 
-    template<class U = V>
-    Matrix<U> T() {
+    Matrix<V> T() {
         auto res = get_empty(n, m);
         
         for (size_t i = 0; i < m; ++i) {
@@ -62,7 +62,7 @@ public:
         return res;
     }
 
-    double norm2() {
+    double norm2() const {
         if (n != 1 && m != 1)
             throw std::invalid_argument("Norm2 not implemented for matrix, just vector");
 
@@ -75,8 +75,8 @@ public:
         return std::sqrt(res);
     }
 
-    template<class U = V>
-    Matrix<U> operator * (const Matrix<U>& other) {
+    template<class U>
+    Matrix<U> operator * (const Matrix<U>& other) const {
         if (n != other.m)
             throw std::invalid_argument("Can not multiply, dimension error");
         
@@ -96,8 +96,9 @@ public:
 
     }
 
-    template<class U = V, class W>
-    Matrix<U> operator * (W w) {
+    template<class W>
+    std::enable_if_t<std::is_arithmetic_v<W>, Matrix<V>>
+    operator * (W w) const {
         auto res = get_empty(m, n);
         for (size_t i = 0; i < m; ++i) {
             for (size_t j = 0; j < n; ++j) {
@@ -109,17 +110,25 @@ public:
     }
 
     template<class W>
-    void operator *= (W w) {
+    std::enable_if_t<std::is_arithmetic_v<W>, void>
+    operator *= (W w) {
         *this = *this * w;
     }
 
-    template<class U = V, class W>
+    template<class U>
     void operator *= (const Matrix<U>& other)
     {
         *this = *this * other;
     }
 
 };
+
+template<class U, class W>
+std::enable_if_t<std::is_arithmetic_v<W>, Matrix<U>>
+operator * (W w, const Matrix<U>& mat)
+{
+    return mat * w;
+}
 
 }
 
