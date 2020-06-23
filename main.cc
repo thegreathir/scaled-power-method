@@ -1,30 +1,35 @@
 #include "matrix.h"
+#include "scaled_power_method.h"
 
-using matrix::Matrix;
+using scaled_power_method::matrix::Matrix;
+using scaled_power_method::CalculateScaledPowerMethod;
 
 int main() {
-
-    auto matrix1 = Matrix<float>({
-        {1, 3, 12, 12},
-        {2, 5, 12, 12},
-        {8, 10, 12, 12},
-        {-10, 5, 12, 12}
+    auto A = Matrix<double>({
+        {1, 1, 1},
+        {-10, -1, 6},
+        {10, -2, -9}
     });
 
-    auto matrix2 = Matrix<float>({
-        {1, 3, 21, 17},
-        {19, -23, 22, 17},
-        {-5, -10, 23, 34},
-        {1, -100, -1, 22},
-    });
+    auto x0 = Matrix<double>({
+        {1, 0, 0}
+    }).T();
 
-    matrix2 *= matrix1;
-    //matrix2 *= 2;
+    std::cout << "A:" << std::endl;
+    std::cout << A << std::endl;
+    
+    std::cout << "x0:" << std::endl;
+    std::cout << x0 << std::endl;
 
-    std::cout << 2 * matrix2 << std::endl;
-    std::cout << matrix2 * 12 << std::endl;
-    matrix2 *= 12;
-    std::cout << matrix2 << std::endl;
+    size_t n;
+
+    std::cout << "Input N: ";
+    std::cin >> n;
+
+    auto [lambda, x] = CalculateScaledPowerMethod(A, x0, n);
+
+    std::cout << "lambda: " << lambda << std::endl;
+    std::cout << "x: " << std::endl << x << std::endl;
 
     return 0;
 }
