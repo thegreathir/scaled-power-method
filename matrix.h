@@ -1,6 +1,8 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
+#include "utils.h"
+
 #include <ios>
 #include <sstream>
 #include <stdexcept>
@@ -9,6 +11,9 @@
 #include <iomanip>
 #include <cmath>
 #include <limits>
+
+namespace matrix
+{
 
 constexpr size_t kPrecision = 2;
 
@@ -90,28 +95,39 @@ public:
         return res;
 
     }
+
+    template<class U = V, class W>
+    Matrix<U> operator * (W w) {
+        auto res = get_empty(m, n);
+        for (size_t i = 0; i < m; ++i) {
+            for (size_t j = 0; j < n; ++j) {
+                res.body[i][j] = body[i][j] * w;
+            }
+        }
+
+        return res;
+    }
+
+    template<class W>
+    void operator *= (W w) {
+        *this = *this * w;
+    }
+
+    template<class U = V, class W>
+    void operator *= (const Matrix<U>& other)
+    {
+        *this = *this * other;
+    }
+
 };
 
-size_t get_number_length(int n) {
-    n = std::abs(n);
-    size_t number_of_digits = 0;
-    do {
-        ++number_of_digits; 
-        n /= 10;
-    } while (n);
-    return number_of_digits;
 }
 
-template <class T> size_t get_fixed_length(T t) {
-  std::stringstream stream;
-  stream << std::setprecision(kPrecision + get_number_length(t)) << t;
-  return stream.str().length();
-}
-
-namespace std {
+namespace std
+{
 
 template<class T>
-std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
+std::ostream& operator << (std::ostream& os, const matrix::Matrix<T>& matrix) {
 
     os <<  matrix.m << "x" << matrix.n << std::endl;
     if (matrix.m == 0 || matrix.n == 0) {
@@ -124,7 +140,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
         size_t col = 0;
         for (const auto& cell : row) {
           max[col] =
-              std::max(max[col], static_cast<int>(get_fixed_length(cell)));
+              std::max(max[col], static_cast<int>(utils::get_fixed_length(cell, matrix::kPrecision)));
           ++col;
         }
     }
@@ -133,7 +149,8 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     for (const auto& row : matrix.body) {
         size_t col = 0;
         for (const auto& cell : row) {
-            os << std::setprecision(kPrecision + get_number_length(cell)) << std::setw(max[col] + 1) << cell;
+            os << std::setprecision(matrix::kPrecision + utils::get_number_length(cell))
+                    << std::setw(max[col] + 1) << cell;
             ++col;
         }
 

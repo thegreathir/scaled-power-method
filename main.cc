@@ -1,5 +1,7 @@
 #include "matrix.h"
 
+using matrix::Matrix;
+
 int main() {
 
     auto matrix1 = Matrix<float>({
@@ -16,7 +18,10 @@ int main() {
         {1, -100, -1, 22},
     });
 
-    std::cout << matrix2 * matrix1 << std::endl;
+    matrix2 *= matrix1;
+    matrix2 *= 2;
+
+    std::cout << matrix2 << std::endl;
 
     return 0;
 }
