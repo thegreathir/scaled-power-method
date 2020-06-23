@@ -17,7 +17,7 @@ namespace scaled_power_method {
 
 namespace matrix {
 
-constexpr size_t kPrecision = 2;
+constexpr size_t kPrecision = 4;
 
 template <class V>
 class Matrix {
@@ -38,9 +38,8 @@ class Matrix {
     Matrix() : m(0), n(0) {
     }
 
-    template <class U = V>
-    static Matrix<U> get_empty(size_t m, size_t n) {
-        auto res = Matrix<U>();
+    static Matrix<V> get_empty(size_t m, size_t n) {
+        auto res = Matrix<V>();
         res.m = m;
         res.n = n;
         res.body.resize(res.m);
@@ -64,7 +63,7 @@ class Matrix {
 
     double Norm2() const {
         if (n != 1 && m != 1)
-            throw std::invalid_argument("Norm2 not implemented for matrix, just vector");
+            throw std::invalid_argument("Norm2 is not implemented for matrix, just vector");
 
         double res = 0;
         for (const auto& row : body) {
@@ -111,14 +110,7 @@ class Matrix {
     template <class W>
     std::enable_if_t<std::is_arithmetic_v<W>, Matrix<V>>
     operator/(W w) const {
-        auto res = get_empty(m, n);
-        for (size_t i = 0; i < m; ++i) {
-            for (size_t j = 0; j < n; ++j) {
-                res.body[i][j] = body[i][j] / w;
-            }
-        }
-
-        return res;
+        return *this * (1.0 / w);
     }
 
     template <class W>
@@ -163,9 +155,8 @@ std::ostream& operator<<(std::ostream& os, const scaled_power_method::matrix::Ma
     for (const auto& row : matrix.body) {
         size_t col = 0;
         for (const auto& cell : row) {
-            max[col] =
-                std::max(max[col], static_cast<int>(scaled_power_method::utils::GetFixedLength(cell,
-                        scaled_power_method::matrix::kPrecision)));
+            max[col] = std::max(max[col], static_cast<int>(scaled_power_method::utils::GetFixedLength(cell,
+                    scaled_power_method::matrix::kPrecision)));
             ++col;
         }
     }
